@@ -1,0 +1,94 @@
+.row
+  .col-xs-12
+    legend Personal Info
+  - if current_user == @user
+    .col-sm-6.col-xs-12
+      .profile-info
+        label.control-label Name
+        .content= @user.name
+    .col-sm-6.col-xs-12
+      .profile-info
+        label.control-label Email
+        .content= @user.email
+  .col-sm-6.col-xs-12
+    .profile-info
+      label.control-label Steps Count
+      .content= @user.total_steps
+  .col-sm-6.col-xs-12
+    .profile-info
+      label.control-label Current Level
+      .content= @user.level
+
+.row.achievements
+  .col-xs-12
+    legend Achievements
+  - if @achievements.present?
+    - @achievements.each do |achievement|
+      .col-sm-6.col-xs-12
+        span.content= "#{@user == current_user ? 'You' : @user.name} have #{achievement.achievable_type == 'Milestone' ? 'achieved' : 'earned'} <b>#{achievement.achievable.try(:name)}</b> #{achievement.achievable_type}".html_safe
+        '
+        - if @user == current_user
+          span.options
+            = hidden_field_tag "achievement_id", achievement.id, class: 'achievement'
+            / = link_to "Post in group", "", class: 'btn btn-primary share'
+            a.btn.btn-primary.share Post in group
+  - else
+    .col-xs-12
+      .text-center
+        span No Acievement for you
+
+#group-popup.my-modal.hide.fade.in
+  .modal-header.txt-white
+    h4 Select groups
+  .modal-body
+    - if @groups.present?
+      ul
+        = hidden_field_tag "achievement_id_modal", '', id: 'ac-id'
+        = text_area_tag 'description', '', id: 'desc', class: 'form-control', placeholder: 'Write something about this...'
+        - @groups.each do |group|
+          li.info
+            label
+              = check_box_tag 'group_id', group.id
+              '
+              = group.name
+    - else
+      p You are not the part of any group
+  .modal-footer
+    button.btn.btn-default#close-btn type="button" Close
+    button.btn.btn-primary#post-btn type="button" Post
+
+javascript:
+  
+  var acId = ''
+  $(document).ready(function(){
+    $('.share').click(function(){
+      $('#group-popup').removeClass('hide');
+      acId = $(this).siblings('.achievement').val();
+    });
+  });
+
+  $(document).on('click', '#close-btn', function(){
+    $('#group-popup').addClass('hide');
+  });
+
+  $(document).on('click', '#post-btn', function(){
+    data = {};
+    data['ac_id'] = acId;
+    groupIds = [];
+    $('input[type=checkbox]').each(function(){
+      if($(this).prop('checked')){
+        groupIds.push($(this).val());
+      }
+    });
+    data['group_ids'] = groupIds;
+    data['description'] = $('#desc').val();
+    $.ajax({
+      url: '/share.json',
+      type: 'POST',
+      data: data,
+      success: function(data){
+
+      }
+    });
+    $('#group-popup').addClass('hide');
+  });

@@ -1,0 +1,27 @@
+.col-md-9.col-xs-8
+  .row
+    .col-xs-12
+      h4= "#{@group.name} Wall"
+      hr
+    .col-xs-12
+      - if @posts.present?
+        - @posts.each do |post|
+          .message-container
+            .author
+              .pull-left
+                = post.posted_by
+              .pull-right
+                = post.posted_at
+            .desc
+              = post.description
+            .content
+              = post.content
+
+.col-md-3.col-xs-4
+  ul#user-list
+    li.list-header
+      | Members List
+    - @group.users.each do |member|
+      li.info
+        = link_to member.name, user_profile_url(member)
+

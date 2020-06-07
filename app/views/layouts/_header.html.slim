@@ -1,0 +1,33 @@
+header.header
+  .container
+    .row
+      .col-xs-2
+        .logo-band
+          = link_to root_url do
+            = image_tag '/images/noise-logo.png', class: 'img-responsive round-image'
+      .col-xs-10
+        .info.pull-right
+          - if user_signed_in?
+            ul.txt-white
+              li
+                = current_user.name
+                '
+                span.fa.fa-caret-down
+                ul#dropdown
+                  li
+                    = link_to root_url do
+                      span.fa.fa-user
+                      '
+                      span Profile
+                  li
+                    = link_to groups_url do
+                      span.fa.fa-users
+                      '
+                      span Groups
+                  li
+                    = link_to destroy_user_session_url, method: :delete  do
+                      span.fa.fa-power-off
+                      '
+                      span Log out
+          - else
+            = link_to "Sign in", new_user_session_url, class: 'txt-white'
